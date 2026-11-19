@@ -1,0 +1,51 @@
+---
+title: "Add a method"
+guide-section: How-to
+---
+
+This adds a renderer drawn with PyVista and offers it as `patch.scene.tube()`. Any backend and namespace work the same way.
+
+## Write the renderer
+
+In `src/dasviz/pv/tube.py`, import the backend inside the function, and declare it with `requires`:
+
+```python
+from dasviz import requires
+from dasviz.prep import color_limits
+
+
+@requires("pyvista")
+def tube(patch, *, scale=None, scale_type="relative"):
+    """Draw the fiber as a tube colored by the data."""
+    import pyvista as pv
+
+    limits = color_limits(patch.data, scale, scale_type)
+    ...
+```
+
+Never import PyVista at the top of the module: dasviz's namespaces are loaded whether or not it is installed. A type used only in annotations goes under `if TYPE_CHECKING:`.
+
+Work out anything that isn't drawing (limits, decimation, geometry) in `dasviz.prep`, where it can be tested without PyVista.
+
+## Bind it to a namespace
+
+Export it from `src/dasviz/pv/__init__.py`, then in `src/dasviz/namespaces/scene.py`:
+
+```python
+from dasviz.pv import tube
+
+
+class ScenePatch(DasvizPatchNamespace):
+    name = "scene"
+    tube = tube
+```
+
+## Test and document it
+
+- Put tests in `tests/pv/`, starting with `pv = pytest.importorskip("pyvista")`. `PYVISTA_OFF_SCREEN` is set for the whole suite.
+- Add it to the reference in `great-docs.yml`.
+- Run `uv run pytest`. The existing tests check that the method declares its backend and that loading dasviz still imports none.
+
+## A new backend
+
+Add an entry to `BACKENDS` in `src/dasviz/_deps.py`, and in `pyproject.toml` an extra, its alias, and its place in `all`. The tests check these agree.

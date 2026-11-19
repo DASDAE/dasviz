@@ -1,0 +1,30 @@
+---
+title: "Install backends"
+guide-section: How-to
+---
+
+Every backend dasviz draws with is an optional extra, with a long and a short name:
+
+| Extra | Alias | Installs | Used by |
+|---|---|---|---|
+| `dasviz[matplotlib]` | `dasviz[mpl]` | matplotlib | `fig` |
+| `dasviz[pyvista]` | `dasviz[pv]` | PyVista (and VTK) | `scene`, `anim` (coming) |
+| `dasviz[all]` | | all of the above | |
+
+```bash
+pip install "dasviz[pv]"
+```
+
+DASCore depends on matplotlib for now, so `dasviz[matplotlib]` installs nothing new today. It is there so that your install keeps working once DASCore no longer does.
+
+## If a backend is missing
+
+The namespaces are there whatever you install; a method checks for its backend when it is called:
+
+```python
+>>> patch.scene.some_method()
+MissingOptionalDependencyError: `some_method` requires pyvista, which is not
+installed. Install it with: pip install "dasviz[pyvista]"
+```
+
+The exception's `install_name` attribute holds the same `dasviz[...]` requirement, for tools which collect what to install.

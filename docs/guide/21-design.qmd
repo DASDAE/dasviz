@@ -1,0 +1,22 @@
+---
+title: "How dasviz is put together"
+guide-section: Explanation
+---
+
+## Namespaces by meaning, code by backend
+
+What a user types names what they want: `patch.fig` for a figure to save, `patch.nb` for something to explore in a notebook, `patch.scene` for 3D, `patch.anim` for a movie. Which library draws it is a detail of each method. A notebook view might be an anywidget, an interactive matplotlib figure or a PyVista scene in Jupyter.
+
+The code is organized the other way: `dasviz.mpl`, `dasviz.pv`, and later others, one package per backend. A backend's renderers share its idioms and its tests, and are installed by one extra. The namespace classes in `dasviz.namespaces` just bind renderers from any backend to names.
+
+## Why nothing is imported until it is used
+
+DASCore finds dasviz's namespaces through entry points, which are registered whatever extras were installed. So `patch.scene` exists even when PyVista does not. If loading the namespace imported PyVista, `patch.scene` would fail, and so would `hasattr`, tab completion and `help`. Instead every renderer imports its backend when it is called, and is decorated with `dasviz.requires`, which checks for the backend first and names the extra which installs it. A test imports every module of dasviz with every backend blocked, to keep it that way.
+
+## Preparation is separate from drawing
+
+The numbers behind a picture (color limits, which samples to show, where the cell edges fall, the labels) are worked out in `dasviz.prep`, which imports no plotting library. A renderer calls `prep` and only draws. This lets two backends showing the same thing agree, and lets the hard part be tested without a display.
+
+## Relationship to DASCore's `viz`
+
+`patch.viz` is DASCore's own matplotlib namespace. dasviz is where its successors are incubated (`fig.waterfall` is the first), and where plots needing packages DASCore won't depend on can live. The aim is that DASCore can eventually stop depending on matplotlib, with dasviz providing its figures. Until then the `viz` name stays DASCore's.

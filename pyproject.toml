@@ -1,0 +1,86 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dasviz"
+dynamic = ["version"]
+description = "Advanced visualizations for distributed acoustic sensing (DAS) data, as DASCore namespaces."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+authors = [{ name = "Derrick Chambers" }]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Visualization",
+]
+dependencies = [
+    # The first release whose Spool, as well as Patch, loads namespaces
+    # from entry points.
+    "dascore>=0.1.25",
+    "numpy>=2",
+]
+
+# One extra per backend, each with a short alias. dasviz._deps.BACKENDS
+# names them too, and tests/test_deps.py checks that the two agree.
+[project.optional-dependencies]
+# DASCore depends on matplotlib for now. dasviz declares it anyway so that
+# it keeps working once DASCore no longer does.
+matplotlib = ["matplotlib>=3.10"]
+mpl = ["dasviz[matplotlib]"]
+pyvista = ["pyvista>=0.44"]
+pv = ["dasviz[pyvista]"]
+all = ["dasviz[matplotlib,pyvista]"]
+
+# Namespaces are named by what they are for, not by the backend that draws
+# them; each is registered for Patch and for Spool. dasviz.namespaces says
+# what each is for.
+[project.entry-points."dascore.patch_namespace"]
+fig = "dasviz.namespaces.fig:FigPatch"
+nb = "dasviz.namespaces.nb:NbPatch"
+scene = "dasviz.namespaces.scene:ScenePatch"
+anim = "dasviz.namespaces.anim:AnimPatch"
+
+[project.entry-points."dascore.spool_namespace"]
+fig = "dasviz.namespaces.fig:FigSpool"
+nb = "dasviz.namespaces.nb:NbSpool"
+scene = "dasviz.namespaces.scene:SceneSpool"
+anim = "dasviz.namespaces.anim:AnimSpool"
+
+[project.urls]
+Repository = "https://github.com/DASDAE/dasviz"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.15",
+]
+docs = [
+    "great-docs>=0.17",
+]
+
+[tool.hatch.version]
+path = "src/dasviz/__init__.py"
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "D"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

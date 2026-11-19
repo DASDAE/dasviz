@@ -1,0 +1,46 @@
+---
+title: "Your first dasviz figure"
+guide-section: Tutorial
+---
+
+In this tutorial you install dasviz, draw a patch with it, and see what its namespaces hold. It takes about five minutes.
+
+## Install
+
+```bash
+pip install dasviz
+```
+
+That brings DASCore if you don't have it. Nothing else is needed for figures; other backends are extras, covered in [Install backends](11-install-backends.qmd).
+
+## Draw a waterfall
+
+```python
+import dascore as dc
+
+patch = dc.get_example_patch()
+ax = patch.fig.waterfall(scale=0.5)
+```
+
+You did not import dasviz. DASCore found the `fig` namespace through dasviz's entry point the first time you used it.
+
+`waterfall` returns the matplotlib axes, so you can carry on with them, or pass your own with `ax=`. Large patches are decimated before drawing: each axis is cut to at most `max_samples` (2048) bins, each keeping its largest-magnitude sample, so spikes stay visible. The color limits always come from the full data.
+
+## Look around
+
+Each namespace says what it holds:
+
+```python
+>>> patch.fig
+<dasviz 'fig' namespace on Patch: waterfall>
+>>> patch.scene
+<dasviz 'scene' namespace on Patch: no methods yet>
+```
+
+A spool has the same namespaces. A method which draws one patch points you to it:
+
+```python
+>>> spool = dc.get_example_spool()
+>>> spool.fig.waterfall()
+AttributeError: fig.waterfall draws a patch, and a spool is many of them. ...
+```

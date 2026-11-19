@@ -1,0 +1,46 @@
+# Great Docs configuration: every option and its default is listed at
+# https://posit-dev.github.io/great-docs/user-guide/configuration.html
+# Build the site with `uv run --group docs great-docs build` (needs Quarto).
+
+display_name: dasviz
+parser: numpy
+dynamic: false # static: no backend is imported to document it
+repo: https://github.com/DASDAE/dasviz
+site_url: https://dasdae.github.io/dasviz/
+pypi: false # not on PyPI yet
+
+authors:
+  - name: Derrick Chambers
+    role: Author
+
+announcement:
+  content: "**Experimental.** dasviz's API will change without notice."
+  type: warning
+  dismissable: true
+
+# Pages are ordered by their number and grouped by `guide-section` in
+# their front matter, following Diataxis: tutorial, how-to, explanation.
+user_guide: docs/guide
+
+reference:
+  - title: Figures (fig)
+    desc: Static figures, as `patch.fig.<method>`.
+    contents:
+      - mpl.waterfall
+  - title: Preparation
+    desc: Backend-free helpers every renderer shares.
+    contents:
+      - prep.color_limits
+      - prep.colorbar_extend
+      - prep.decimate_for_display
+      - prep.default_colormap
+      - prep.cell_edges
+      - prep.CellEdges
+      - prep.dim_label
+      - prep.data_label
+  - title: Extending dasviz
+    desc: Declaring and importing optional backends.
+    contents:
+      - requires
+      - import_backend
+      - Backend
