@@ -7,7 +7,7 @@ parser: numpy
 dynamic: false # static: no backend is imported to document it
 repo: https://github.com/DASDAE/dasviz
 site_url: https://dasdae.github.io/dasviz/
-pypi: false # not on PyPI yet
+pypi: true
 
 authors:
   - name: Derrick Chambers
