@@ -32,4 +32,4 @@ dasviz adds visualizations to DASCore's `Patch` and `Spool` as method namespaces
 
 ## Releasing
 
-Bump `__version__` in `src/dasviz/__init__.py` on `main`, then publish a GitHub release tagged `v<version>`. `.github/workflows/release.yml` builds, refuses a tag which doesn't match the version, and publishes to PyPI by trusted publishing (environment `pypi`; no token is stored). The docs deploy from the same release.
+Bump `__version__` in `src/dasviz/__init__.py` on `main`, then publish a GitHub release tagged `v<version>`. `.github/workflows/publish.yml` builds, refuses a tag which doesn't match the version, and publishes to PyPI by trusted publishing (environment `pypi`; no token is stored). The docs deploy from the same release.

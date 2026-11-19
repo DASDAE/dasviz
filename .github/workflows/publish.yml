@@ -2,9 +2,9 @@
 #
 # Uses PyPI trusted publishing (OIDC), so no token is stored. One-time setup:
 # on PyPI, add a trusted publisher for project `dasviz` with owner `DASDAE`,
-# repository `dasviz`, workflow `release.yml`, and environment `pypi`; then
+# repository `dasviz`, workflow `publish.yml`, and environment `pypi`; then
 # create a GitHub environment named `pypi` in the repository settings.
-name: Release
+name: Publish
 on:
   release:
     types:
