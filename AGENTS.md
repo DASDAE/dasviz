@@ -29,3 +29,7 @@ dasviz adds visualizations to DASCore's `Patch` and `Spool` as method namespaces
 - `uv run pytest`, `uv run ruff check .`, `uv run ruff format --check .`.
 - Without extras: `uv sync` then `uv run pytest` (backend tests skip; the import-guard tests still run). CI runs Python 3.12 and 3.14, each with no extras and with all of them, and once against DASCore's `dev` branch.
 - Docs: a Great Docs site (`great-docs.yml`) from the README, the docstrings, and `docs/guide/` (pages ordered by number, grouped by Diataxis `guide-section`). Build with `uv run --group docs great-docs build` (needs Quarto).
+
+## Releasing
+
+Bump `__version__` in `src/dasviz/__init__.py` on `main`, then publish a GitHub release tagged `v<version>`. `.github/workflows/release.yml` builds, refuses a tag which doesn't match the version, and publishes to PyPI by trusted publishing (environment `pypi`; no token is stored). The docs deploy from the same release.
