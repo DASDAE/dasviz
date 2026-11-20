@@ -69,7 +69,9 @@ class TestIsColocated:
 
 class TestEncodeCategories:
     def test_codes_follow_sorted_categories(self):
-        codes, cats = encode_categories(np.array(["borehole", "trenched", "loose", "trenched"]))
+        codes, cats = encode_categories(
+            np.array(["borehole", "trenched", "loose", "trenched"])
+        )
         assert list(cats) == ["borehole", "loose", "trenched"]
         assert list(codes) == [0, 2, 1, 2]
 
@@ -131,8 +133,17 @@ class TestMakeColorSource:
 
 def test_find_static_coords(random_patch_with_xyz):
     patch = random_patch_with_xyz.update_coords(
-        section=("distance", np.array(["stuff"]*len(random_patch_with_xyz.get_array("distance")), dtype=object)),
-        temperature_offset=("time", np.array([1]*len(random_patch_with_xyz.get_array("time")), dtype=object)),
+        section=(
+            "distance",
+            np.array(
+                ["stuff"] * len(random_patch_with_xyz.get_array("distance")),
+                dtype=object,
+            ),
+        ),
+        temperature_offset=(
+            "time",
+            np.array([1] * len(random_patch_with_xyz.get_array("time")), dtype=object),
+        ),
     )
     found = find_static_coords(
         patch, exclude=("x", "y", "z", "time", "distance"), fiber_dim="distance"

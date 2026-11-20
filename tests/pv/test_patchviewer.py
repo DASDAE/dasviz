@@ -265,7 +265,9 @@ class TestColorSources:
     @pytest.fixture
     def sectioned(self):
         n = N_DIST
-        sections = np.array(["loose"] * 4 + ["trenched"] * 4 + ["borehole"] * 4, dtype=object)
+        sections = np.array(
+            ["loose"] * 4 + ["trenched"] * 4 + ["borehole"] * 4, dtype=object
+        )
         return _make_patch(
             np.arange(n, dtype=float),
             np.zeros(n),
@@ -323,7 +325,9 @@ class TestColorSources:
         actor = next(iter(viewer.plotter.renderer.actors.values()))
         lut = actor.mapper.lookup_table
         # Sorted categories: borehole, loose, trenched.
-        expected = category_color_list(["borehole", "loose", "trenched"], {"loose": "red"})
+        expected = category_color_list(
+            ["borehole", "loose", "trenched"], {"loose": "red"}
+        )
         for k, color in enumerate(expected):
             np.testing.assert_allclose(
                 lut.GetTableValue(k)[:3], pv.Color(color).float_rgb, atol=1 / 255
