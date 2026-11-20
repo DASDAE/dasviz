@@ -22,8 +22,8 @@ DASCore depends on matplotlib for now, so `dasviz[matplotlib]` installs nothing 
 The namespaces are there whatever you install; a method checks for its backend when it is called:
 
 ```python
->>> patch.scene.some_method()
-MissingOptionalDependencyError: `some_method` requires pyvista, which is not
+>>> patch.scene.patchviewer()
+MissingOptionalDependencyError: `patchviewer` requires pyvista, which is not
 installed. Install it with: pip install "dasviz[pyvista]"
 ```
 

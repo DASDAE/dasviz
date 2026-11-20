@@ -60,7 +60,8 @@ class TestAccess:
 
     def test_repr_lists_methods(self, patch, spool):
         assert repr(patch.fig) == "<dasviz 'fig' namespace on Patch: waterfall>"
-        assert repr(patch.scene).endswith("no methods yet>")
+        assert repr(patch.scene).endswith("scene' namespace on Patch: patchviewer>")
+        assert repr(patch.anim).endswith("no methods yet>")
         assert "'fig' namespace on" in repr(spool.fig)
 
 

@@ -6,7 +6,7 @@ dasviz adds advanced visualizations to [DASCore](https://github.com/DASDAE/dasco
 |---|---|---|
 | `fig` | static figures, to save or publish | `patch.fig.waterfall()` |
 | `nb` | interactive views in a notebook | (coming) |
-| `scene` | 3D scenes | (coming) |
+| `scene` | 3D scenes | `patch.scene.patchviewer()` |
 | `anim` | animations and movies | (coming) |
 
 ## Install

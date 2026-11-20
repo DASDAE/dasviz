@@ -26,6 +26,12 @@ def patch():
 
 
 @pytest.fixture()
+def random_patch_with_xyz():
+    """DASCore's example patch: dims (distance, time), absolute times."""
+    return dc.get_example_patch("random_patch_with_xyz")
+
+
+@pytest.fixture()
 def spool():
     """DASCore's example spool."""
     return dc.get_example_spool()

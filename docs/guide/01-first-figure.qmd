@@ -34,7 +34,7 @@ Each namespace says what it holds:
 >>> patch.fig
 <dasviz 'fig' namespace on Patch: waterfall>
 >>> patch.scene
-<dasviz 'scene' namespace on Patch: no methods yet>
+<dasviz 'scene' namespace on Patch: patchviewer>
 ```
 
 A spool has the same namespaces. A method which draws one patch points you to it:

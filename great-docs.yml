@@ -27,6 +27,11 @@ reference:
     desc: Static figures, as `patch.fig.<method>`.
     contents:
       - mpl.waterfall
+  - title: Scenes (scene)
+    desc: 3D scenes, as `patch.scene.<method>`.
+    contents:
+      - pv.patchviewer
+      - pv.PatchViewer
   - title: Preparation
     desc: Backend-free helpers every renderer shares.
     contents:
@@ -38,6 +43,19 @@ reference:
       - prep.CellEdges
       - prep.dim_label
       - prep.data_label
+      - prep.get_valid_runs
+      - prep.is_colocated
+      - prep.encode_categories
+      - prep.category_color_list
+      - prep.make_color_source
+      - prep.find_static_coords
+      - prep.time_to_seconds
+      - prep.coerce_step
+      - prep.nice_step
+      - prep.nearest_index
+      - prep.advance_playhead
+      - prep.format_time
+      - prep.format_duration
   - title: Extending dasviz
     desc: Declaring and importing optional backends.
     contents:
