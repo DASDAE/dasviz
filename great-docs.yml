@@ -44,6 +44,7 @@ reference:
       - prep.dim_label
       - prep.data_label
       - prep.get_valid_runs
+      - prep.change_points
       - prep.is_colocated
       - prep.encode_categories
       - prep.category_color_list

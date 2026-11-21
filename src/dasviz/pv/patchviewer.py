@@ -20,6 +20,7 @@ from dasviz.prep import (
     DEFAULT_KEY_STEPS,
     advance_playhead,
     category_color_list,
+    change_points,
     coerce_step,
     color_limits,
     colorbar_extend,
@@ -75,6 +76,7 @@ def patchviewer(
     plotter=None,
     color_by=None,
     category_colors=None,
+    split_by=None,
     key_step=None,
     controls=True,
     show=False,
@@ -125,6 +127,13 @@ def patchviewer(
     category_colors
         ``{coord_name: {category: color}}``. Categories not listed fall back to
         a default palette.
+    split_by
+        Name (or names) of static coords marking where the cable is not
+        continuous, such as a borehole or leg. The fiber is cut wherever any of
+        them changes between adjacent channels, rather than joining the end of
+        one piece to the start of the next. Needed after selecting channels
+        (e.g. only the downgoing legs), since channels that were far apart then
+        sit next to each other. Channels with NaN positions always split it.
     key_step
         How much data time one left/right arrow press advances (holding the key
         repeats, giving a pseudo-animation). A ``np.timedelta64``,
@@ -169,6 +178,17 @@ def patchviewer(
     # must not be empty for a patch with no data type or units.
     label = data_label(patch) or "Data"
     points = np.column_stack([patch.coords.get_array(c) for c in (x, y, z)])
+    breaks = None
+    if split_by is not None:
+        names = [split_by] if isinstance(split_by, str) else list(split_by)
+        for name in names:
+            if patch.coords.dim_map.get(name) != (fiber_dim,):
+                msg = (
+                    f"split_by coord '{name}' must depend only on '{fiber_dim}'; "
+                    f"options are {find_static_coords(patch, (), fiber_dim)}"
+                )
+                raise ParameterError(msg)
+        breaks = change_points(*(patch.coords.get_array(n) for n in names))
 
     # Arrow keys step through *time*, not samples, so playback speed is comparable
     # between patches with different sample rates or lengths.
@@ -202,7 +222,7 @@ def patchviewer(
     pieces = []  # (mesh, start, end, idx); idx maps mesh points -> fiber samples
     meshes = []
     actors = []
-    for start, end in get_valid_runs(points):
+    for start, end in get_valid_runs(points, breaks):
         seg_pts = points[start:end]
         if is_colocated(seg_pts):
             mesh = pv.Sphere(radius=radius * sphere_scale_factor, center=seg_pts[0])

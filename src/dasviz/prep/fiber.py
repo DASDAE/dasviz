@@ -49,7 +49,45 @@ TAB20 = (
 )
 
 
-def get_valid_runs(points: np.ndarray) -> list[tuple[int, int]]:
+def change_points(*arrays: np.ndarray) -> np.ndarray:
+    """
+    Mark where any of several per-channel arrays changes value.
+
+    Returns a boolean array as long as the inputs, True at index ``i`` when
+    the value at ``i`` differs from the one at ``i - 1`` in any array (never
+    at 0). Pass the result as `get_valid_runs`'s `breaks` to start a new piece
+    of fiber there. Non-numeric values are compared as strings, and NaN equals
+    NaN, so a run of missing values is not a change.
+
+    Raises
+    ------
+    ValueError
+        If no arrays are given, or they differ in length.
+    """
+    if not arrays:
+        msg = "change_points needs at least one array."
+        raise ValueError(msg)
+    arrays = tuple(np.asarray(a) for a in arrays)
+    if len({a.shape for a in arrays}) != 1 or arrays[0].ndim != 1:
+        shapes = [a.shape for a in arrays]
+        msg = f"change_points needs 1D arrays of one length, got {shapes}."
+        raise ValueError(msg)
+    out = np.zeros(len(arrays[0]), dtype=bool)
+    for arr in arrays:
+        if arr.dtype.kind in "fiu":
+            arr = arr.astype(float)
+            both_nan = np.isnan(arr[1:]) & np.isnan(arr[:-1])
+            differs = (arr[1:] != arr[:-1]) & ~both_nan
+        else:
+            strings = arr.astype(str)
+            differs = strings[1:] != strings[:-1]
+        out[1:] |= differs
+    return out
+
+
+def get_valid_runs(
+    points: np.ndarray, breaks: np.ndarray | None = None
+) -> list[tuple[int, int]]:
     """
     Find contiguous runs of rows in `points` that contain no NaNs.
 
@@ -57,6 +95,15 @@ def get_valid_runs(points: np.ndarray) -> list[tuple[int, int]]:
     ``points[start:end]`` is one drawable piece of fiber. Rows with NaN
     coordinates (fiber that has no spatial reference) split the fiber into
     separate pieces.
+
+    Parameters
+    ----------
+    points
+        An (n, 3) array of positions along the fiber.
+    breaks
+        Optional boolean array of length n. Where ``breaks[i]`` is True a new
+        piece starts at row ``i`` even though row ``i - 1`` is valid, for
+        fiber that is not continuous (see `change_points`).
     """
     points = np.asarray(points, dtype=float)
     mask = ~np.isnan(points).any(axis=1)
@@ -65,7 +112,19 @@ def get_valid_runs(points: np.ndarray) -> list[tuple[int, int]]:
     diff = np.diff(padded.astype(int))
     starts = np.where(diff == 1)[0]
     ends = np.where(diff == -1)[0]
-    return [(int(s), int(e)) for s, e in zip(starts, ends, strict=True)]
+    runs = [(int(s), int(e)) for s, e in zip(starts, ends, strict=True)]
+    if breaks is None:
+        return runs
+    breaks = np.asarray(breaks, dtype=bool)
+    if breaks.shape != (len(points),):
+        msg = f"breaks must have one value per row ({len(points)}), got {breaks.shape}."
+        raise ValueError(msg)
+    out = []
+    for start, end in runs:
+        cuts = np.flatnonzero(breaks[start + 1 : end]) + start + 1
+        edges = [start, *map(int, cuts), end]
+        out.extend(zip(edges[:-1], edges[1:], strict=True))
+    return out
 
 
 def is_colocated(points: np.ndarray, atol: float = 1e-6) -> bool:

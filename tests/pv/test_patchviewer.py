@@ -333,6 +333,26 @@ class TestColorSources:
                 lut.GetTableValue(k)[:3], pv.Color(color).float_rgb, atol=1 / 255
             )
 
+    def test_split_by_cuts_fiber_where_coord_changes(self, viewers, sectioned):
+        # Sections are 4 channels each, so a cut at each of the two changes.
+        viewer = _plot(viewers, sectioned, split_by="section")
+        assert len(viewer.meshes) == 3
+
+    def test_split_by_accepts_several_names(self, viewers, sectioned):
+        viewer = _plot(viewers, sectioned, split_by=["section", "offset"])
+        assert len(viewer.meshes) == N_DIST  # offset changes at every channel
+
+    def test_no_split_by_keeps_one_piece(self, viewers, sectioned):
+        assert len(_plot(viewers, sectioned).meshes) == 1
+
+    def test_split_by_unknown_coord_raises(self, sectioned):
+        with pytest.raises(ParameterError, match="split_by"):
+            patchviewer(sectioned, split_by="nope", controls=False)
+
+    def test_split_by_time_coord_raises(self, sectioned):
+        with pytest.raises(ParameterError, match="split_by"):
+            patchviewer(sectioned, split_by="time", controls=False)
+
     def test_unknown_color_source_raises(self, viewers, sectioned):
         viewer = _plot(viewers, sectioned)
         with pytest.raises(KeyError, match="Unknown color source"):

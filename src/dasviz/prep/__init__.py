@@ -11,6 +11,7 @@ from dasviz.prep.axes import CellEdges, cell_edges, data_label, dim_label, is_ti
 from dasviz.prep.fiber import (
     MISSING_STRINGS,
     category_color_list,
+    change_points,
     encode_categories,
     find_static_coords,
     get_valid_runs,
@@ -41,6 +42,7 @@ __all__ = [
     "advance_playhead",
     "category_color_list",
     "cell_edges",
+    "change_points",
     "coerce_step",
     "color_limits",
     "colorbar_extend",

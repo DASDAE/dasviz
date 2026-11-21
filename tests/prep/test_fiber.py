@@ -8,6 +8,7 @@ import pytest
 from dasviz.prep import (
     MISSING_STRINGS,
     category_color_list,
+    change_points,
     encode_categories,
     find_static_coords,
     get_valid_runs,
@@ -51,6 +52,66 @@ class TestGetValidRuns:
         ((start, end),) = get_valid_runs(np.zeros((3, 3)))
         assert type(start) is int
         assert type(end) is int
+
+
+class TestGetValidRunsBreaks:
+    def test_break_splits_a_valid_run(self):
+        breaks = np.zeros(6, dtype=bool)
+        breaks[3] = True
+        assert get_valid_runs(np.zeros((6, 3)), breaks) == [(0, 3), (3, 6)]
+
+    def test_breaks_combine_with_nan_gaps(self):
+        pts = np.zeros((8, 3))
+        pts[4] = np.nan
+        breaks = np.zeros(8, dtype=bool)
+        breaks[2] = breaks[6] = True
+        expected = [(0, 2), (2, 4), (5, 6), (6, 8)]
+        assert get_valid_runs(pts, breaks) == expected
+
+    def test_break_on_a_nan_row_changes_nothing(self):
+        pts = np.zeros((5, 3))
+        pts[2] = np.nan
+        breaks = np.zeros(5, dtype=bool)
+        breaks[2] = True
+        assert get_valid_runs(pts, breaks) == get_valid_runs(pts)
+
+    def test_none_and_all_false_agree(self):
+        pts = np.zeros((5, 3))
+        assert get_valid_runs(pts, np.zeros(5, dtype=bool)) == get_valid_runs(pts)
+
+    def test_wrong_length_raises(self):
+        with pytest.raises(ValueError, match="one value per row"):
+            get_valid_runs(np.zeros((5, 3)), np.zeros(4, dtype=bool))
+
+
+class TestChangePoints:
+    def test_strings(self):
+        arr = np.array(["a", "a", "b", "b", "a"], dtype=object)
+        assert list(change_points(arr)) == [False, False, True, False, True]
+
+    def test_numbers(self):
+        result = change_points(np.array([1, 1, 2, 2]))
+        assert list(result) == [False, False, True, False]
+
+    def test_any_array_changing_counts(self):
+        holes = np.array(["h1", "h1", "h1", "h2"])
+        legs = np.array(["down", "down", "up", "up"])
+        assert list(change_points(holes, legs)) == [False, False, True, True]
+
+    def test_nan_equals_nan(self):
+        arr = np.array([np.nan, np.nan, 1.0, np.nan])
+        assert list(change_points(arr)) == [False, False, True, True]
+
+    def test_never_true_at_zero(self):
+        assert not change_points(np.array(["x", "y"]))[0]
+
+    def test_no_arrays_raises(self):
+        with pytest.raises(ValueError, match="at least one"):
+            change_points()
+
+    def test_length_mismatch_raises(self):
+        with pytest.raises(ValueError, match="one length"):
+            change_points(np.zeros(3), np.zeros(4))
 
 
 class TestIsColocated:
